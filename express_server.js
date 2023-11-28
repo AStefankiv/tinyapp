@@ -1,9 +1,11 @@
 const express = require("express");
+const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -24,16 +26,18 @@ app.get("/hello", (req, res) => {
 });
 
 app.get('/urls', (req, res) => {// Add a new route to handle the GET request to /urls
-  const templateVars = { urls: urlDatabase };// Pass the urlDatabase object to our template
+  const templateVars = { urls: urlDatabase, username: req.cookies['username'] };// Pass the urlDatabase object to our template
+  console.log(templateVars);
   res.render("urls_index", templateVars);// Pass the urlDatabase object to our 'urls_index' template
 });
 
 app.get("/urls/new", (req, res) => {// Add a new route to handle the GET request to /urls/new
-  res.render("urls_new");// Pass the urlDatabase object to our 'urls_new' template
+  const templateVars = { username: req.cookies['username'] };// Pass the urlDatabase object to our template
+  res.render("urls_new", templateVars);// Pass the urlDatabase object to our 'urls_new' template
 });
 
 app.get("/urls/:id", (req, res) => {// Add a new route to handle the GET request to /urls/:id
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };// Pass the urlDatabase object to our template
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies['username'] };// Pass the urlDatabase object to our template
   res.render("urls_show", templateVars);// Pass the urlDatabase object to our 'urls_show' template
 });
 
@@ -60,6 +64,17 @@ app.post("/urls/:id", (req, res) => {// Add a new route to handle the POST reque
   const longURL = req.body.longURL;// Get the longURL from the request
   urlDatabase[shortURL] = longURL;// Update the key-value pair in the urlDatabase object
   res.redirect('/urls');// Redirect the client to /urls
+});
+
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  res.cookie('username', username);
+  res.redirect('/urls');
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+  res.redirect('/urls');
 });
 
 

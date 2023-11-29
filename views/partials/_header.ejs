@@ -20,7 +20,7 @@
 
 
         <% if (username) { %>
-          <span class="nav-item nav-link" style="color: black;">Logged in as: <span style="color: blue; font-size: 1.2em;"><%= username %></span></span>
+          <span class="nav-item nav-link" style="color: black;">Logged in as: <span style="color: blue; font-size: 1.2em;"><%= username.email %></span></span>
           <form class="form-inline justify-content-center" action="/logout" method="POST">
             <div class="form-group mb-2">
               <button type="submit" class="btn btn-primary">Logout</button>

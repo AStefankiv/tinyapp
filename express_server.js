@@ -45,8 +45,12 @@ app.get('/urls', (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { username: users[req.cookies.user_id] };
-  res.render("urls_new", templateVars);
+  if (users[req.cookies.user_id]) {//If user is logged in, render urls_new
+    const templateVars = { username: users[req.cookies.user_id] };
+    res.render("urls_new", templateVars);//Render urls_new
+  } else {//If user is not logged in, redirect to /login
+    res.redirect('/login');//Redirect to /login
+  }
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -55,15 +59,23 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  const shortURL = generateRandomString();
-  const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
-  res.redirect(`/urls/${shortURL}`);
+  if (users[req.cookies.user_id]) {//If user is logged in, render urls_new
+    const shortURL = generateRandomString();
+    const longURL = req.body.longURL;
+    urlDatabase[shortURL] = longURL;
+    res.redirect(`/urls/${shortURL}`);
+  } else {//If user is not logged in, redirect to /login
+    res.send('<html><body><b>Cannot create new URL without logging in</b></body></html>\n');
+  }
 });
 
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
-  res.redirect(longURL);
+  if (urlDatabase[req.params.id]) {
+    const longURL = urlDatabase[req.params.id];
+    res.redirect(longURL);
+  } else {
+    res.send('<html><body><b>Short URL does not exist</b></body></html>\n');
+  }
 });
 
 app.post("/urls/:id/delete", (req, res) => {
@@ -91,8 +103,14 @@ app.post("/logout", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const templateVars = { username: users[req.cookies.user_id] };
-  res.render("urls_register", templateVars);
+  // const templateVars = { username: users[req.cookies.user_id] };
+  // res.render("urls_register", templateVars);
+  if (users[req.cookies.user_id]) {//If user is logged in, redirect to /urls
+    res.redirect('/urls');//Redirect to /urls
+  } else {//If user is not logged in, render login page
+    const templateVars = { username: users[req.cookies.user_id] };
+    res.render("urls_register", templateVars);//Render login page
+  }
 });
 
 app.post("/register", (req, res) => {
@@ -130,12 +148,20 @@ app.post("/login", (req, res) => {
   } else {
     res.cookie('user_id', userFound.id);
     res.redirect('/urls');
+    console.log('Users:');
+    console.log(users);
   }
 });
 
 app.get("/login", (req, res) => {
-  const templateVars = { username: users[req.cookies.user_id] };
-  res.render("urls_login", templateVars);
+  // const templateVars = { username: users[req.cookies.user_id] };
+  // res.render("urls_login", templateVars);
+  if (users[req.cookies.user_id]) {//If user is logged in, redirect to /urls
+    res.redirect('/urls');//Redirect to /urls
+  } else {//If user is not logged in, render login page
+    const templateVars = { username: users[req.cookies.user_id] };
+    res.render("urls_login", templateVars);//Render login page
+  }
 });
 
 

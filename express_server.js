@@ -39,9 +39,9 @@ app.get("/hello", (req, res) => {
 
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase, username: users[req.cookies.user_id] };
-  console.log(templateVars);
+  // console.log(users[req.cookies.user_id]);//Log the user_id cookie
   res.render("urls_index", templateVars);
-  console.log(req.cookies['user_id']);
+  // console.log(req.cookies['user_id']);
 });
 
 app.get("/urls/new", (req, res) => {
@@ -79,19 +79,19 @@ app.post("/urls/:id", (req, res) => {
   res.redirect('/urls');
 });
 
-app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie('username', username);
-  res.redirect('/urls');
-});
+// app.post("/login", (req, res) => {
+//   const username = req.body.username;
+//   res.cookie('username', username);
+//   res.redirect('/urls');
+// });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
 app.get("/register", (req, res) => {
-  const templateVars = { username: req.cookies['username'] };
+  const templateVars = { username: users[req.cookies.user_id] };
   res.render("urls_register", templateVars);
 });
 
@@ -105,7 +105,6 @@ app.post("/register", (req, res) => {
     password,
   };
 
-  
   if (!email || !password) {
     return res.status(400).send('Email or password cannot be empty');
   } else if (getUserByEmail(email, users)) {
@@ -115,9 +114,29 @@ app.post("/register", (req, res) => {
     res.cookie('user_id', userId);
     res.redirect('/urls');
   }
-  
 });
 
+app.post("/login", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  const userFound = getUserByEmail(email, users);
+
+  if (!email || !password) {
+    return res.status(403).send('Email or password cannot be empty');
+  } else if (!userFound) {
+    return res.status(403).send('Email does not exist');
+  } else if (userFound.password !== password) {
+    return res.status(403).send('Password is incorrect');
+  } else {
+    res.cookie('user_id', userFound.id);
+    res.redirect('/urls');
+  }
+});
+
+app.get("/login", (req, res) => {
+  const templateVars = { username: users[req.cookies.user_id] };
+  res.render("urls_login", templateVars);
+});
 
 
 app.listen(PORT, () => {

@@ -10,14 +10,13 @@
       aria-expanded="false"
       aria-label="Toggle navigation"
     >
-      <span class="navbar-toggler-icon">
-      </span>
+      <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-
+        <a class="nav-item nav-link" href="/register">Register</a>
 
         <% if (username) { %>
           <span class="nav-item nav-link" style="color: black;">Logged in as: <span style="color: blue; font-size: 1.2em;"><%= username.email %></span></span>
@@ -27,20 +26,8 @@
             </div>
           </form>
         <% } else { %>
-          <form class="form-inline justify-content-center" action="/login" method="POST">
-            <div class="form-group mb-2">
-              <input
-                class="form-control"
-                type="text"
-                name="username"
-                placeholder="Username"
-                style="width: 100%; max-width: 160px; margin: auto"
-              />
-              <button type="submit" class="btn btn-primary">Login</button>
-            </div>
-          </form>
+          <a class="nav-item nav-link" href="/login">Login</a>
         <% } %>
-
       </div>
     </div>
   </nav>

@@ -1,14 +1,15 @@
 const express = require("express");
 const bcrypt = require('bcrypt');
-// const cookieParser = require('cookie-parser');
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080;
+const methodOverride = require('method-override');
 const cookieSession = require('cookie-session');
 const getUserByEmail = require('./helpers');
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
-// app.use(cookieParser());
+
+app.use(methodOverride('_method'));
 
 app.use(cookieSession({
   name: 'session',
@@ -119,9 +120,8 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
-app.post("/urls/:id/delete", (req, res) => {
+app.delete("/urls/:id/delete", (req, res) => {
   const loggedInUser = users[req.session.user_id];
-
   if (!loggedInUser) {
     return res.status(401).send('<html><body><b>Cannot view URLs without logging in. (page "/urls/:id") </b></body></html>\n');
   }
@@ -136,13 +136,10 @@ app.post("/urls/:id/delete", (req, res) => {
     return res.status(401).send('<html><body><b>Access denied. This is not your url.</b></body></html>\n');
   }
 
-
+  console.log(req.params.id);
   const shortURL = req.params.id;
   delete urlDatabase[shortURL];
   res.redirect('/urls');
-
-  const templateVars = { shortURL: req.params.id, longURL: url, username: users[req.session.user_id] };
-  res.render('urls_show', templateVars);//Render login page
 
 });
 

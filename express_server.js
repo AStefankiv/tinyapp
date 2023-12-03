@@ -1,7 +1,10 @@
 const express = require("express");
+const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
+// const password = 'purple-monkey-dinosaur';
+// const hashedPassword = bcrypt.hashSync(password, 10);
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
@@ -131,7 +134,7 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect('/urls');
 
   const templateVars = { shortURL: req.params.id, longURL: url, username: users[req.cookies.user_id] };
-  res.render('urls_show', templateVars);
+  res.render('urls_show', templateVars);//Render login page
 
 });
 
@@ -174,7 +177,7 @@ app.post("/register", (req, res) => {
   const newUser = {
     id: userId,
     email,
-    password,
+    password: bcrypt.hashSync(password, 10)
   };
 
   if (!email || !password) {
@@ -200,9 +203,15 @@ app.post("/login", (req, res) => {
   if (!userFound) {
     return res.status(403).send('Email does not exist');
   }
-  if (userFound.password !== password) {
+  // if (userFound.password !== password) {
+  //   return res.status(403).send('Password is incorrect');
+  // }
+  if (!bcrypt.compareSync(password, userFound.password)) {
     return res.status(403).send('Password is incorrect');
   }
+  console.log('Cookie: ', req.cookies);//Object - Cookie:  { usernameAAA: 'stefankif35@gmail.com', username: 'Andrii' }
+  console.log('-----------------------------');
+  console.log('Cookie user_id: ', req.cookies.user_id);//undefined
 
   res.cookie('user_id', userFound.id);
   res.redirect('/urls');

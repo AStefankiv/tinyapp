@@ -57,7 +57,6 @@ app.get('/urls', (req, res) => {
   if (!loggedInUser) {
     res.send('<html><body><b>Cannot view URLs without logging in</b></body></html>\n');
   }
-  console.log('userURLs: ', urlsForUser(req.session.user_id));
 });
 
 app.get("/urls/new", (req, res) => {
@@ -134,8 +133,6 @@ app.get("/u/:id", (req, res) => {
   } else if (url.visitors) {
     url.visitors += 1;
   }
-  
-  console.log('URL Database: ', urlDatabase);
 
   if (!userID) {
     return res.status(401).send('<html><body><b>Cannot view URLs without logging in</b></body></html>\n');
@@ -164,7 +161,6 @@ app.delete("/urls/:id/delete", (req, res) => {
     return res.status(401).send('<html><body><b>Access denied. This is not your url.</b></body></html>\n');
   }
 
-  console.log(req.params.id);
   const shortURL = req.params.id;
   delete urlDatabase[shortURL];
   res.redirect('/urls');
@@ -222,8 +218,6 @@ app.post("/register", (req, res) => {
     req.session.user_id = userId;
     res.redirect('/urls');
   }
-  console.log('Users', users);
-  console.log('Single user: ', req.session.user_id);
 });
 
 app.post("/login", (req, res) => {
